@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <title>显示文章列表</title>
+        <style>
+           th,td {
+                font-size: 12px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="addButton">
+			<a href="./showEditor.html" style="text-decoration:none;font-weight:bold;">发表文章</a>
+        </div>
+        <div id="content">
+			<table border="1" id="mytable">
+
+
+			</table>
+        </div>
+        <script src="js/config.js"></script>
+        <script src="js/jquery.min.js"></script>
+        <script type="text/javascript">
+            var contextPath = getContextPath();
+            $(function() {
+                $.ajax({
+                    url:  window.location.origin + contextPath + '/getArticleListData',
+                    type: 'get',
+                    success: function (res) {
+                        var htmlStr = "<tr>";
+                        htmlStr += "<th>文章ID</th>";
+                        htmlStr += "<th>文章名称</th>";
+                        htmlStr += "<th>操作</th>";
+                        if(res.length >0){
+                            for(var i=0;i<res.length;i++){
+                                
+                                htmlStr += "<tr>";
+                                htmlStr += "<td>"+res[i].id+"</td><td>"+res[i].title+"</td><td><a target='_blank' href='./previewArticle.html?id="+res[i].id+"'>查看</a>,<a href='./showEditor.html?id="+res[i].id+"'>编辑</a>,<a href='#' onclick=deleteArticle("+res[i].id+")>删除</a></td>";
+                                htmlStr += "</tr>";
+                            
+                            }
+                            document.getElementById("mytable").innerHTML = htmlStr;
+                        } 
+                    },
+                    error: function (result) {alert("加载文章列表失败，内部错误");}
+                });
+            });
+
+            //删除文章
+            function deleteArticle(id){
+                if (window.confirm("确认删除?")) {
+                    //删除文章
+                    $.ajax({
+                        url:  contextPath + "/deleteArticle",
+                        data: JSON.stringify({
+                            id: id,
+                        }),
+                        type: 'post',
+                        contentType: 'application/json;charset=utf-8',
+                        dataType: "json",
+                        success: function (res) {
+                            alert("成功删除文章");
+                            window.location.href = "./articleList.html";
+                        },
+                        error: function (result) {alert("删除文章失败，内部错误.");}
+                    });
+                }
+            }
+
+        </script>
+    </body>
+</html>

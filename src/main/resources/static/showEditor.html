@@ -1,0 +1,213 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+		<meta name="renderer" content="webkit" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <meta name="keywords" content="Editor.md,editor,Markdown Editor,Markdown,编辑器,Markdown编辑器,Markdown在线编辑器,在线编辑器,开源编辑器,开源Markdown编辑器" />
+        <meta name="description" content="Editor.md: a simple online markdown editor. 开源在线 Markdown 编辑器" />
+        <title>发布新文章</title>
+        <link rel="stylesheet" href="css/style.css" />
+        <link rel="stylesheet" href="css/editormd.css" />
+        <style>
+            a {text-decoration:none;}
+        </style>
+    </head>
+    <body>
+        <div id="layout">
+            <header>
+                <h1>
+                    文章标题：
+                    <input type="text" name="title" id="title" style="width:600px;" />
+                    <a href="#" onclick="addOrUpdateArticle()" style="color:red;">发布文章</a>
+                    <a href="articleList.html" style="color:green;float:right">返回文章列表</a>
+                </h1>
+            </header>
+            <div id="test-editormd">
+<textarea style="display:none;" id="myTextArea">
+[TOC]
+
+=====================标题==================
+# 一级标题
+## 二级标题
+### 三级标题
+#### 四级标题
+##### 五级标题
+###### 六级标题
+
+=====================文本样式==================
+*强调文本* _强调文本_
+**加粗文本** __加粗文本__
+==标记文本==
+~~删除文本~~
+> 引用文本
+
+H~2~O is是液体。
+
+`H~2~O is是液体。`
+
+`2^10^ 运算结果是 1024。`
+
+2^10^ 运算结果是 1024。
+=====================列表==================
+- 项目
+    * 项目
+    + 项目
+    
+
+1. 项目1
+2. 项目2
+3. 项目3
+
+- [ ] 计划任务
+- [x] 完成任务
+
+=====================链接==================
+链接: [link](https://www.csdn.net/).
+
+图片: ![Alt](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9hdmF0YXIuY3Nkbi5uZXQvNy83L0IvMV9yYWxmX2h4MTYzY29tLmpwZw)
+
+带尺寸的图片: ![Alt](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9hdmF0YXIuY3Nkbi5uZXQvNy83L0IvMV9yYWxmX2h4MTYzY29tLmpwZw =30x30)
+
+=====================目录==================
+[TOC]
+# 一级目录
+## 二级目录
+### 三级目录
+=====================代码片==================
+下面展示一些 `内联代码片`。
+
+```
+// A code block
+var foo = 'bar';
+```
+
+```javascript
+// An highlighted block
+var foo = 'bar';
+```
+=====================表格==================
+项目     | Value
+-------- | -----
+电脑  | $1600
+手机  | $12
+导管  | $1
+
+| Column 1 | Column 2      |
+|:--------:| -------------:|
+| centered 文本居中 | right-aligned 文本居右 |
+
+</textarea>
+            </div>
+        </div>
+        <script src="js/config.js"></script>
+        <script src="js/jquery.min.js"></script>
+        <script src="js/editormd.js"></script>
+        <script type="text/javascript">
+            var contextPath = getContextPath();
+            var id = getQueryVariable("id");
+			var testEditor;
+            var addFlag = false;
+            $(function() {
+
+                //id为空串表示是新发文章
+                if(id === ""){
+                    
+                    //标记为新增文章，首次
+                    addFlag = true;
+
+                    //直接构造
+                    testEditor = editormd("test-editormd", {
+                        width   : "100%",
+                        height  : 640,
+                        syncScrolling : "single",
+                        path    : contextPath + "/lib/",
+                        imageUpload: true, //同意图片上传
+                        imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+                        imageUploadURL: contextPath +"/article/uploadImg",       //图片上传URL 即后台的图片上传接口URL
+                        onload : function() {
+                            
+                        }
+                    });
+
+                }else{
+                    //编辑文章
+                    $.ajax({
+                        url:  window.location.origin + contextPath +'/getArticleById?id='+id,
+                        type: 'get',
+                        success: function (res) {
+                            if(res.title != undefined){
+                                document.title = res.title;
+                                document.getElementById("title").value = res.title;
+                                document.getElementById("myTextArea").value = res.content;
+                                //编辑时先把数据查询出来，然后再构造编辑器
+                                testEditor = editormd("test-editormd", {
+                                    width   : "100%",
+                                    height  : 640,
+                                    syncScrolling : "single",
+                                    path    : contextPath +"/lib/",
+                                    imageUpload: true, //同意图片上传
+                                    imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+                                    imageUploadURL: contextPath +"/article/uploadImg",       //图片上传URL 即后台的图片上传接口URL
+                                    onload : function() {
+                                        
+                                    }
+                                });
+                            }else{
+                                alert("未找到文章");
+                            }
+                        },
+                        error: function (result) {
+                        }
+                    });
+                    
+                }
+                
+            });
+
+            //发布文章
+            function addOrUpdateArticle(){
+                var title = document.getElementById("title").value;
+                if(title === ""){
+                    alert("文章标题不能为空");
+                    return;
+                }
+                var content = document.getElementById("myTextArea").value;
+                var url = contextPath +"/addArticle";
+                if(!addFlag) url = contextPath +"/updateArticle";
+                //编辑文章或新增文章到数据库
+                $.ajax({
+                    url:  url,
+                    data: JSON.stringify({
+                        id: id,
+                        title: title,
+                        content: content
+                    }),
+                    type: 'post',
+                    contentType: 'application/json;charset=utf-8',
+                    dataType: "json",
+                    success: function (res) {
+                        alert("成功发布文章");
+                        window.location.href = contextPath +"/articleList.html";
+                    },
+                    error: function (result) {alert("发布文章失败，内部错误.");}
+                });
+
+            }
+
+            //获取浏览器地址上的url参数
+            function getQueryVariable(variable){
+                var query = window.location.search.substring(1);
+                var vars = query.split("&");
+                for (var i=0;i<vars.length;i++) {
+                    var pair = vars[i].split("=");
+                    if(pair[0] == variable){return pair[1];}
+                }
+                return "";
+            }
+        </script>
+    </body>
+</html>

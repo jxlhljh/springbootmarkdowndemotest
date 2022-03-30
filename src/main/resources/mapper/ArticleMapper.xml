@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace= "cn.gzsendi.web.mapper.ArticleMapper" >
+
+    <select id="getArticleList" resultType="cn.gzsendi.web.model.Article">
+        select * from article
+    </select>
+
+    <insert id="addArticle" parameterType="cn.gzsendi.web.model.Article" useGeneratedKeys="true" keyProperty="id">
+        insert into article(title,content) values (#{title},#{content})
+    </insert>
+    
+    <update id="updateArticle" parameterType="cn.gzsendi.web.model.Article">
+        update article set title=#{title},content=#{content} where id = #{id}
+    </update>
+    
+    <delete id="deleteArticle" parameterType="cn.gzsendi.web.model.Article">
+        delete from article where id = #{id}
+    </delete>
+
+    <select id="getArticleById" resultType="cn.gzsendi.web.model.Article">
+        select * from article where id = #{id}
+    </select>
+    
+</mapper>
