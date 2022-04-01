@@ -105,6 +105,7 @@ var foo = 'bar';
         </div>
         <script src="js/config.js"></script>
         <script src="js/jquery.min.js"></script>
+        <script src="js/uploadImage.js"></script>
         <script src="js/editormd.js"></script>
         <script type="text/javascript">
             var contextPath = getContextPath();
@@ -129,7 +130,7 @@ var foo = 'bar';
                         imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
                         imageUploadURL: contextPath +"/article/uploadImg",       //图片上传URL 即后台的图片上传接口URL
                         onload : function() {
-                            
+                            initPasteDragImg(this); //支持复制图片直接粘贴
                         }
                     });
 
@@ -153,7 +154,7 @@ var foo = 'bar';
                                     imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
                                     imageUploadURL: contextPath +"/article/uploadImg",       //图片上传URL 即后台的图片上传接口URL
                                     onload : function() {
-                                        
+                                        initPasteDragImg(this); //支持复制图片直接粘贴
                                     }
                                 });
                             }else{
